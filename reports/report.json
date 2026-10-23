@@ -1,0 +1,124 @@
+{
+  "incident_id": "INC-2026-1042",
+  "genere_le": "2026-10-23T10:50:16+00:00",
+  "mode_analyse": "ollama",
+  "modele": "qwen2.5:1.5b",
+  "preuves": {
+    "collecte_le": "2026-10-23T10:48:15+00:00",
+    "metriques": {
+      "source": "Prometheus",
+      "erreurs_500_derniere_minute": 21.91380569758948,
+      "requetes_orders_derniere_minute": 21.860312602470216,
+      "latence_p95_secondes": 0.00475,
+      "cible_up": 1.0,
+      "premieres_erreurs_observees": "2026-10-23T09:23:53+00:00"
+    },
+    "detection": {
+      "verdict": "anomalie",
+      "anomaly": true,
+      "fenetre": "1m",
+      "criteres_declenches": [
+        "volume",
+        "taux",
+        "ecart_baseline"
+      ],
+      "details": [
+        {
+          "critere": "volume",
+          "valeur": 21.91,
+          "seuil": 3,
+          "declenche": true,
+          "explication": "22 erreur(s) HTTP 500 sur 1m (seuil 3)."
+        },
+        {
+          "critere": "taux",
+          "valeur": 1.0024,
+          "seuil": 0.05,
+          "declenche": true,
+          "explication": "100.2% des requêtes /orders en erreur (seuil 5%)."
+        },
+        {
+          "critere": "ecart_baseline",
+          "valeur": 6.45,
+          "seuil": 3.0,
+          "declenche": true,
+          "explication": "z-score 6.4 par rapport à une baseline moyenne de 0.69 erreur(s) par fenêtre (seuil 3.0)."
+        }
+      ],
+      "regle": "anomalie = volume ET taux dépassés ET (écart à la baseline OU pas d'historique)"
+    },
+    "logs": {
+      "source": "docker compose logs api",
+      "lignes_brutes": 442,
+      "extrait": [
+        "api-1  | 2026-10-23T10:39:51.426587578Z ERROR:    order_processing_failed db_connection_timeout event=INC-2026-1042  (x40)",
+        "api-1  | 2026-10-23T10:39:51.430580162Z INFO:     [IP MASQUÉE] - \"GET /orders HTTP/1.1\" 500 Internal Server Error  (x40)"
+      ]
+    },
+    "changement": {
+      "release": "2.4.7",
+      "deployed_at_scenario": "2026-10-22T10:15:00Z",
+      "first_errors_scenario": "2026-10-22T10:17:00Z",
+      "source": "Ordre de mission TECHCORP + docs/fake_incident.log",
+      "redemarrage_conteneur_api_lab": "2026-10-23T09:23:03.843653542Z"
+    }
+  },
+  "analyse": {
+    "symptomes": [
+      "22 erreur(s) HTTP 500 sur 1m (seuil 3)",
+      "100.2% des requêtes /orders en erreur (seuil 5)",
+      "z-score 6.4 par rapport à une baseline moyenne de 0.69 erreur(s) par fenêtre (seuil 3.0)"
+    ],
+    "hypotheses": [
+      {
+        "hypothese": "Le problème provient d'une connexion timeout dans la base de données.",
+        "confiance": "faible",
+        "preuves_pour": [
+          "Ligne de code dans le log indiquant une connexion timeout",
+          "Les erreurs HTTP 500 dans la métrique latence"
+        ],
+        "preuves_manquantes": [
+          "Les logs de la base de données ne sont pas disponibles"
+        ]
+      },
+      {
+        "hypothese": "Le problème est lié à une défaillance dans la réception des requêtes.",
+        "confiance": "elevee",
+        "preuves_pour": [
+          "Les erreurs HTTP 500 dans la métrique requetes_orders_derniere_minute"
+        ],
+        "preuves_manquantes": [
+          "Les logs de la base de données ne sont pas disponibles"
+        ]
+      }
+    ],
+    "preuves": [
+      "Les métriques et les logs indiquent des anomalies dans les erreurs HTTP 500 et les requêtes en erreur."
+    ],
+    "controles_non_destructifs": [
+      "L'examen des logs et des métriques permet de déterminer les symptômes de l'incident."
+    ],
+    "limites": [
+      "Il est important de noter que les logs et métriques peuvent ne pas couvrir tous les aspects du problème, car ils ne sont pas disponibles pour toutes les erreurs HTTP 500."
+    ],
+    "remediation_proposee": {
+      "action": "Examiner les logs et métriques pour identifier les causes potentielles.",
+      "risque": "Il n'y a pas de risque potentiel de défaillance du système.",
+      "rollback": "Nécessite une approbation humaine.",
+      "approbation_humaine_requise": true
+    }
+  },
+  "controle_sortie_llm": [
+    "type_non_conforme:preuves",
+    "type_non_conforme:controles_non_destructifs",
+    "type_non_conforme:limites"
+  ],
+  "confidence": "unverified",
+  "human_approval_required": true,
+  "approbation": {
+    "statut": "approuvee",
+    "approuve_par": "Landry TOUOTAP",
+    "date": "2026-10-23T11:03:23+00:00",
+    "note": "Approbation enregistrée. L'action reste à exécuter par un humain, selon la procédure de changement."
+  }
+}
