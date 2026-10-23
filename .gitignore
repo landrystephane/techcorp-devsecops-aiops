@@ -3,4 +3,4 @@ __pycache__/
 .env
 *.key
 *.pem
-report.json
+/report.json

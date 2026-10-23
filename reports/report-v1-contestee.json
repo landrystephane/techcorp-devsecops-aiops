@@ -1,0 +1,105 @@
+{
+  "incident_id": "INC-2026-1042",
+  "genere_le": "2026-10-23T10:42:04+00:00",
+  "mode_analyse": "ollama",
+  "modele": "qwen2.5:1.5b",
+  "preuves": {
+    "collecte_le": "2026-10-23T10:40:42+00:00",
+    "metriques": {
+      "source": "Prometheus",
+      "erreurs_500_derniere_minute": 21.899808376676702,
+      "requetes_orders_derniere_minute": 21.899808376676702,
+      "latence_p95_secondes": 0.004750000000000001,
+      "cible_up": 1.0,
+      "premieres_erreurs_observees": "2026-10-23T10:40:06+00:00"
+    },
+    "detection": {
+      "verdict": "anomalie",
+      "anomaly": true,
+      "fenetre": "1m",
+      "criteres_declenches": [
+        "volume",
+        "taux",
+        "ecart_baseline"
+      ],
+      "details": [
+        {
+          "critere": "volume",
+          "valeur": 21.9,
+          "seuil": 3,
+          "declenche": true,
+          "explication": "22 erreur(s) HTTP 500 sur 1m (seuil 3)."
+        },
+        {
+          "critere": "taux",
+          "valeur": 1.0,
+          "seuil": 0.05,
+          "declenche": true,
+          "explication": "100.0% des requêtes /orders en erreur (seuil 5%)."
+        },
+        {
+          "critere": "ecart_baseline",
+          "valeur": 21.9,
+          "seuil": 3.0,
+          "declenche": true,
+          "explication": "z-score 21.9 par rapport à une baseline moyenne de 0.00 erreur(s) par fenêtre (seuil 3.0)."
+        }
+      ],
+      "regle": "anomalie = volume ET taux dépassés ET (écart à la baseline OU pas d'historique)"
+    },
+    "logs": {
+      "source": "docker compose logs api",
+      "lignes_brutes": 402,
+      "extrait": [
+        "api-1  | 2026-10-23T10:39:51.426587578Z ERROR:    order_processing_failed db_connection_timeout event=INC-2026-1042  (x20)",
+        "api-1  | 2026-10-23T10:39:51.430580162Z INFO:     [IP MASQUÉE] - \"GET /orders HTTP/1.1\" 500 Internal Server Error  (x20)"
+      ]
+    },
+    "changement": {
+      "release": "2.4.7",
+      "deployed_at_scenario": "2026-10-22T10:15:00Z",
+      "first_errors_scenario": "2026-10-22T10:17:00Z",
+      "source": "Ordre de mission TECHCORP + docs/fake_incident.log",
+      "redemarrage_conteneur_api_lab": "2026-10-23T09:23:03.843653542Z"
+    }
+  },
+  "analyse": {
+    "symptomes": [
+      "22 erreur(s) HTTP 500 sur 1m (seuil 3)",
+      "100.0% des requêtes /orders en erreur (seuil 5)",
+      "z-score 21.9 par rapport à une baseline moyenne de 0.00 erreur(s) par fenêtre (seuil 3.0)"
+    ],
+    "hypotheses": [
+      {
+        "hypothese": "Anomalie due à un problème de déclenchement de la règle de volume et de taux dépassés.",
+        "confiance": "faible",
+        "preuves_pour": [
+          "volume dépassé",
+          "taux dépassé",
+          "z-score supérieur à 3.0"
+        ],
+        "preuves_manquantes": [
+          "historique de déclenchement"
+        ]
+      }
+    ],
+    "preuves": "22 erreur(s) HTTP 500 sur 1m (seuil 3), 100.0% des requêtes /orders en erreur (seuil 5), z-score 21.9 par rapport à une baseline moyenne de 0.00 erreur(s) par fenêtre (seuil 3.0)",
+    "controles_non_destructifs": "Lecture des métriques et des logs",
+    "limites": "Il est important de noter que cette anomalie a été détectée après le déclenchement de la règle, ce qui peut indiquer une cause potentiellement liée à la règle elle-même.",
+    "remediation_proposee": {
+      "action": "Analyse approfondie des déclencheurs de la règle de déclenchement",
+      "risque": "Le risque est considéré comme faible car la règle a été déclenchée après l'anomalie.",
+      "rollback": "Nécessite une approbation humaine",
+      "approbation_humaine_requise": true
+    }
+  },
+  "controle_sortie_llm": [],
+  "confidence": "unverified",
+  "human_approval_required": true,
+  "approbation": {
+    "statut": "en_attente",
+    "approuve_par": null,
+    "date": null,
+    "note": "Aucune action n'est exécutée par ce script."
+  }
+}
