@@ -7,7 +7,7 @@
   ],
   "timezone": "browser",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "editable": false,
   "refresh": "5s",
   "time": {
@@ -229,7 +229,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "max(ALERTS{alertname=\"ElevatedHTTP500\", alertstate=\"firing\"}) or vector(0)",
+          "expr": "(2 * max(ALERTS{alertname=\"ElevatedHTTP500\", alertstate=\"firing\"})) or max(ALERTS{alertname=\"ElevatedHTTP500\", alertstate=\"pending\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
@@ -245,6 +245,10 @@
                   "color": "green"
                 },
                 "1": {
+                  "text": "Pending",
+                  "color": "orange"
+                },
+                "2": {
                   "text": "FIRING",
                   "color": "red"
                 }
@@ -259,8 +263,12 @@
                 "value": null
               },
               {
-                "color": "red",
+                "color": "orange",
                 "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
               }
             ]
           }
@@ -277,7 +285,8 @@
           "fields": "",
           "values": false
         }
-      }
+      },
+      "description": "0 = inactive, 1 = pending (condition vraie depuis moins de 15 s), 2 = firing"
     },
     {
       "id": 5,
