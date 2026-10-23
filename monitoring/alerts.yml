@@ -1,0 +1,10 @@
+groups:
+  - name: techcorp-alerts
+    rules:
+      - alert: ElevatedHTTP500
+        expr: sum(increase(techcorp_http_requests_total{status="500"}[1m])) >= 3
+        for: 15s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Multiple HTTP 500 responses during the last minute"

@@ -1,0 +1,20 @@
+name: TECHCORP Security CI
+on:
+  push:
+  pull_request:
+jobs:
+  test-and-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest
+      - run: python -m pytest -q
+      - name: Docker build
+        run: docker build -t techcorp-api:ci .
+      # TODO (students): integrate secret scan and vulnerability scan with pinned actions.
+      # TODO: implement security gate based on approved risk policy.

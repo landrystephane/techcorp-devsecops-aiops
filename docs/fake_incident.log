@@ -1,0 +1,4 @@
+2026-10-22T10:15:01Z INFO deployment release=2.4.7 event=deploy_success
+2026-10-22T10:17:02Z ERROR db_connection_timeout route=/orders event=INC-2026-1042
+2026-10-22T10:17:02Z ERROR http_status=500 route=/orders event=INC-2026-1042
+2026-10-22T10:17:04Z WARN request_rate_spike route=/orders
